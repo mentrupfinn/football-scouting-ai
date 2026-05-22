@@ -86,4 +86,5 @@ This project is primarily focused on learning, experimentation, and building pra
 ## 👤 Author
 
 Finn Mentrup
+
 Built as a personal project exploring AI applications in football scouting.

@@ -3,4 +3,4 @@ from src.similarity import get_similar_players
 
 df = load_players()
 
-print(get_similar_players(df, "J. Kimmich"))
+print(get_similar_players(df, "E. Haaland"))
