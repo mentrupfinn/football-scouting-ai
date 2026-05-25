@@ -21,6 +21,11 @@ def get_player(player_name):
         params={"player_name": player_name}
     )
 
+def load_player_names():
+    query = "SELECT name FROM players;"
+
+    return sorted(pd.read_sql(text(query), engine)["name"].unique())
+
 def load_players(position=None, limit=None):
     query = "SELECT * FROM players"
 
@@ -44,6 +49,7 @@ def import_players(csv_path="data/players_raw.csv"):
 
     df = df[
         [
+            "fifa_version",
             "short_name",
             "age",
             "player_positions",
@@ -67,6 +73,9 @@ def import_players(csv_path="data/players_raw.csv"):
     })
 
     df = df.dropna()
+
+    df = df[df["fifa_version"] == 23]
+    df = df.drop(columns=["fifa_version"])
 
     df.to_sql(
         "players",

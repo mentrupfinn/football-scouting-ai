@@ -1,14 +1,13 @@
 import streamlit as st
 
-from src.db import load_players
+from src.db import load_player_names
 from src.similarity import get_similar_players
 
 
 st.title("⚽ Football Scouting AI")
 
 # alle Spielernamen laden
-df = load_players(limit=5000)   # erstmal begrenzen für schnelleren Start
-player_names = sorted(df["name"].unique())
+player_names = load_player_names()
 
 selected_player = st.selectbox(
     "Choose a player:",
