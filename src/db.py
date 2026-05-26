@@ -12,7 +12,7 @@ def get_player(player_name):
     query = """
         SELECT *
         FROM players
-        WHERE name = :player_name;
+        WHERE Name = :player_name;
     """
 
     return pd.read_sql(
@@ -24,7 +24,7 @@ def get_player(player_name):
 def load_player_names():
     query = "SELECT name FROM players;"
 
-    return sorted(pd.read_sql(text(query), engine)["name"].unique())
+    return pd.read_sql(text(query), engine)
 
 def load_players(position=None, limit=None):
     query = "SELECT * FROM players"
@@ -45,37 +45,11 @@ def load_players(position=None, limit=None):
     return pd.read_sql(text(query), engine)
 
 def import_players(csv_path="data/players_raw.csv"):
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path,sep=";")
 
-    df = df[
-        [
-            "fifa_version",
-            "short_name",
-            "age",
-            "player_positions",
-            "club_name",
-            "league_name",
-            "pace",
-            "shooting",
-            "passing",
-            "dribbling",
-            "defending",
-            "physic"
-        ]
-    ]
+    df.columns = (df.columns.str.strip().str.lower().str.replace(" ", "_"))
 
-    df = df.rename(columns={
-        "short_name": "name",
-        "player_positions": "position",
-        "club_name": "club",
-        "league_name": "league",
-        "physic": "physical"
-    })
-
-    df = df.dropna()
-
-    df = df[df["fifa_version"] == 23]
-    df = df.drop(columns=["fifa_version"])
+    df = df.drop(columns=["empf", "info"])
 
     df.to_sql(
         "players",
@@ -88,3 +62,6 @@ def import_players(csv_path="data/players_raw.csv"):
 
 if __name__ == "__main__":
     import_players()
+    df = load_players()
+    print(df.head())
+    print(df.columns.tolist())
