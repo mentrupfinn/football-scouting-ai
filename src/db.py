@@ -26,10 +26,13 @@ def load_player_names():
 
     return pd.read_sql(text(query), engine)
 
-def load_players(position=None, limit=None):
+def load_players(position=None, significant = True, limit=None):
     query = "SELECT * FROM players"
 
     conditions = []
+
+    if significant:
+        conditions.append("min_ > 900")
 
     if position:
         conditions.append(f"position LIKE '%{position}%'")
@@ -47,11 +50,21 @@ def load_players(position=None, limit=None):
 def import_players(path="data/players_raw.html"):
     df = pd.read_html(path, encoding="utf-8")[0]
 
-    df.columns = (df.columns.str.strip().str.lower().str.replace(" ", "_"))
+    df.columns = (df.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(".", "_"))
 
     df = df.drop(columns=["empf", "info"])
 
     df = df.replace("-", 0.0)
+
+    df["min_"] = (
+        df["min_"]
+        .str.replace(",", "", regex=False)
+        .replace("-", 0)
+    )
+
+    df["lauf/90"] = (df["lauf/90"].str.replace("km", "", regex=False))
+
+    df["min_"] = pd.to_numeric(df["min_"], errors="coerce")
 
     df.to_sql(
         "players",

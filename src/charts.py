@@ -1,42 +1,46 @@
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import streamlit as st
+import plotly.graph_objects as go
 
 from src.db import load_players
 
 def radar(player_name, features):
     df = load_players()
 
-    df_shoot = df[features].apply(pd.to_numeric, errors="coerce")
-    df_z = (df_shoot - df_shoot.mean()) / df_shoot.std()
+    df_stats = df[features].apply(pd.to_numeric, errors="coerce")
 
-    player = df_z[df["name"] == player_name].iloc[0]
+    player_stats = df_stats[df["name"] == player_name].iloc[0].tolist()
 
-    categories = features.copy()
+    df_pct = df_stats.rank(pct=True)
 
-    values = player.values.tolist()
+    player_pct = df_pct[df["name"] == player_name].iloc[0].tolist()
 
-    # Kreis schließen
-    values = values + values[:1]
+    fig = go.Figure()
 
-    N = len(categories)
+    fig.add_trace(go.Scatterpolar(
+        r=player_pct + [player_pct[0]],
+        theta=features + [features[0]],
+        fill='toself',
+        name = "",
+        customdata = player_stats + [player_stats[0]],
+        hovertemplate=
+            "<b>%{theta}</b><br>" +
+            "Value: %{customdata:.2f}<br>" +
+            "Percentile: %{r:.0%}<br>" +
+            "<extra></extra>"
+    ))
 
-    angles = np.linspace(0, 2*np.pi, N, endpoint=False).tolist()
-    angles = angles + angles[:1]
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 1],
+                showline = False,
+                showticklabels = False,
+                ticks = ""
+            ),
+            bgcolor='rgba(0,0,0,0)'
+        )
+    )
 
-    fig, ax = plt.subplots(figsize=(5,5), subplot_kw=dict(polar=True), facecolor="none")
-
-    ax.plot(angles, values)
-    ax.fill(angles, values, alpha=0.25)
-
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(categories, color="white")
-
-    ax.tick_params(axis = 'x', pad=15)
-    ax.tick_params(colors="white")
-
-    ax.set_facecolor("none")
-    fig.set_facecolor("none")
-
-    st.pyplot(fig)
+    st.plotly_chart(fig)

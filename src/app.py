@@ -97,7 +97,7 @@ with left:
         st.write(f"Gehalt: {player['gehalt']}")
         st.write(f"Transferwert: {player['transferwert']}")
         st.write(f"Einsätze: {player['eins']}")
-        st.write(f"Spielminuten: {player['min.']}")
+        st.write(f"Spielminuten: {player['min_']}")
 
 with right:
 
