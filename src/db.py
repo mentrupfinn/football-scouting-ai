@@ -12,7 +12,7 @@ def get_player(player_name):
     query = """
         SELECT *
         FROM players
-        WHERE Name = :player_name;
+        WHERE name = :player_name;
     """
 
     return pd.read_sql(
@@ -44,12 +44,14 @@ def load_players(position=None, limit=None):
 
     return pd.read_sql(text(query), engine)
 
-def import_players(csv_path="data/players_raw.csv"):
-    df = pd.read_csv(csv_path,sep=";")
+def import_players(path="data/players_raw.html"):
+    df = pd.read_html(path, encoding="utf-8")[0]
 
     df.columns = (df.columns.str.strip().str.lower().str.replace(" ", "_"))
 
     df = df.drop(columns=["empf", "info"])
+
+    df = df.replace("-", 0.0)
 
     df.to_sql(
         "players",
