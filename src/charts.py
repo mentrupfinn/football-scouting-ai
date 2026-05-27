@@ -36,7 +36,10 @@ def plot_positions(player):
 
     return fig
 
-def radar(player_name, df, features):
+def radar(player_name, df, features, comparison_group):
+    position_cols = POSITION_GROUPS[comparison_group]
+    df = df[df[position_cols].any(axis=1)]
+
     df_stats = df[features].apply(pd.to_numeric, errors="coerce")
 
     player_stats = df_stats[df["name"] == player_name].iloc[0].tolist()
@@ -74,3 +77,15 @@ def radar(player_name, df, features):
     )
 
     return fig
+
+def get_valid_position_groups(player_row):
+
+    valid_groups = []
+
+    for group_name, positions in POSITION_GROUPS.items():
+
+        # prüft ob irgendeine Positionsspalte True ist
+        if player_row[positions].any():
+            valid_groups.append(group_name)
+
+    return valid_groups

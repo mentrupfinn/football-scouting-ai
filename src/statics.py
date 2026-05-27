@@ -88,12 +88,13 @@ rest_features = [
 ]
 
 POSITION_GROUPS = {
-    "TW": {"TW(Z)"},
+    "Alle" : POSITIONS,
+    "TW": ["TW(Z)"],
     "IV": ["V(Z)"],
     "AV": ["V(L)", "V(R)", "FV(L)", "FV(R)"],
     "DM": ["DM(Z)"],
     "ZM": ["M(L)", "M(Z)", "M(R)"],
     "OM": ["OM(Z)"],
-    "Flügel": ["OM(L)", "OM(R)"],
+    "Flg": ["OM(L)", "OM(R)"],
     "ST": ["ST(Z)"]
 }

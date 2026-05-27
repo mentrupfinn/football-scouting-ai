@@ -49,9 +49,11 @@ with right:
     with toggle:
         st.write("")
         st.write("")
+        available_groups = get_valid_position_groups(selected_player)
         comparison_group = st.pills("",
-            options=["Alle", "TW", "IV", "AV", "DM", "ZM", "OM", "Flügel", "ST"],
-            default="Alle"
+            options=available_groups,
+            default=available_groups[0],
+            required = True
         )
 
     with chart:
@@ -60,22 +62,22 @@ with right:
                                                             "Ballbesitz", "Verteidigung", "Torwart", "Rest"])
 
         with tab1:
-            st.plotly_chart(radar(selected_name, players, shooting_features))
+            st.plotly_chart(radar(selected_name, players, shooting_features, comparison_group))
         
         with tab2:
-            st.plotly_chart(radar(selected_name, players, passing_features))
+            st.plotly_chart(radar(selected_name, players, passing_features, comparison_group))
 
         with tab3:
-            st.plotly_chart(radar(selected_name, players, crossing_features))
+            st.plotly_chart(radar(selected_name, players, crossing_features, comparison_group))
 
         with tab4:
-            st.plotly_chart(radar(selected_name, players, possession_features))
+            st.plotly_chart(radar(selected_name, players, possession_features, comparison_group))
 
         with tab5:
-            st.plotly_chart(radar(selected_name, players, defensive_features))
+            st.plotly_chart(radar(selected_name, players, defensive_features, comparison_group))
 
         with tab6:
-            st.plotly_chart(radar(selected_name, players, goalkeeping_features))
+            st.plotly_chart(radar(selected_name, players, goalkeeping_features, comparison_group))
 
         with tab7:
-            st.plotly_chart(radar(selected_name, players, rest_features))
+            st.plotly_chart(radar(selected_name, players, rest_features, comparison_group))
