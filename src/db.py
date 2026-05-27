@@ -1,54 +1,11 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
 import re
 from itertools import product
+import streamlit as st
 
-# Format:
-# postgresql://user:password@host:port/database
+from src.statics import POSITIONS
 
-DB_URL = "postgresql://postgres:9450@localhost:5432/scouting_db"
-
-engine = create_engine(DB_URL)
-
-def get_player(player_name):
-    query = """
-        SELECT *
-        FROM players
-        WHERE name = :player_name;
-    """
-
-    return pd.read_sql(
-        text(query),
-        engine,
-        params={"player_name": player_name}
-    )
-
-def load_player_names():
-    query = "SELECT name FROM players;"
-
-    return pd.read_sql(text(query), engine)
-
-def load_players(position=None, significant = True, limit=None):
-    query = "SELECT * FROM players"
-
-    conditions = []
-
-    if significant:
-        conditions.append("min_ > 900")
-
-    if position:
-        conditions.append(f"position LIKE '%{position}%'")
-
-    if conditions:
-        query += " WHERE " + " AND ".join(conditions)
-
-    if limit:
-        query += f" LIMIT {limit}"
-
-    query += ";"
-
-    return pd.read_sql(text(query), engine)
-
+@st.cache_data(show_spinner="Lade Spielerdaten...")
 def import_players(path="data/players_raw.html"):
     df = pd.read_html(path, encoding="utf-8")[0]
 
@@ -58,12 +15,6 @@ def import_players(path="data/players_raw.html"):
 
     df = df.replace("-", 0.0)
 
-    df["min_"] = (
-        df["min_"]
-        .str.replace(",", "", regex=False)
-        .replace("-", 0)
-    )
-
     df["lauf/90"] = (df["lauf/90"].str.replace("km", "", regex=False))
 
     df["min_"] = pd.to_numeric(df["min_"], errors="coerce").astype("Int64")
@@ -71,14 +22,7 @@ def import_players(path="data/players_raw.html"):
     pos_matrix = df["position"].apply(encode_position_matrix).apply(pd.Series)
     df = pd.concat([df, pos_matrix], axis=1)
 
-    df.to_sql(
-        "players",
-        engine,
-        if_exists="replace",
-        index=False
-    )
-
-    print(f"{len(df)} Spieler importiert.")
+    return df
 
 def parse_fm_position(pos_string):
     pos_string = str(pos_string)
@@ -106,15 +50,6 @@ def parse_fm_position(pos_string):
 
     return results
 
-POSITIONS = [
-    "TW(Z)",
-    "V(L)", "V(Z)", "V(R)",
-    "FV(L)", "DM(Z)", "FV(R)",
-    "M(L)", "M(Z)", "M(R)",
-    "OM(L)", "OM(Z)", "OM(R)",
-    "ST(Z)"
-]
-
 def encode_position_matrix(pos_string):
     pairs = parse_fm_position(pos_string)
 
@@ -129,6 +64,3 @@ def encode_position_matrix(pos_string):
             features[key] = True
 
     return features
-
-if __name__ == "__main__":
-    import_players()
