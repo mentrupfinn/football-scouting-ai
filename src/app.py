@@ -1,7 +1,7 @@
 import streamlit as st
 
-from src.db import load_player_names, get_player
-from src.charts import radar
+from src.db import *
+from src.charts import *
 
 shooting_features = [
     "xg/90",
@@ -61,6 +61,17 @@ Rest = [
     "vek/90"
 ]
 
+POSITION_GROUPS = {
+    "TW": {"TW"},
+    "IV": ["D (C)", "DC", "D"],
+    "AV": ["D (L)", "D (R)", "DL", "DR", "WBL", "WBR"],
+    "DM": ["DM"],
+    "ZM": ["M", "MC"],
+    "OM": ["AM", "AMC", "OM"],
+    "Flügel": ["AM (L)", "AM (R)", "AML", "AMR"],
+    "ST": ["ST"]
+}
+
 st.set_page_config(layout="wide")
 
 pad1,top,pad2 = st.columns([1,2,1])
@@ -81,7 +92,7 @@ player = player_df.iloc[0]
 
 st.divider()
 
-left, middle, right = st.columns([2, 2, 2])
+left, middle, right = st.columns([4, 3, 6])
 
 with left:
     st.header(selected_player)
@@ -99,28 +110,52 @@ with left:
         st.write(f"Einsätze: {player['eins']}")
         st.write(f"Spielminuten: {player['min_']}")
 
+with middle:
+    pos = st.container(border = True)
+
+    with pos:
+        fig = plot_positions(get_player(selected_player).iloc[0])
+        st.pyplot(fig)
+
 with right:
 
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Schießen", "Passen", "Flanken",
-                                                         "Ballbesitz", "Verteidigung", "Torwart", "Rest"])
+    toggle, chart = st.columns([1,7])
 
-    with tab1:
-        radar(selected_player, shooting_features)
-    
-    with tab2:
-        radar(selected_player, passing_features)
+    with toggle:
+        st.write("")
+        st.write("")
+        comparison_group = st.pills("",
+            options=["Alle", "TW", "IV", "AV", "DM", "ZM", "OM", "Flügel", "ST"],
+            default="ST"
+        )
 
-    with tab3:
-        radar(selected_player, crossing_features)
+    with chart:
 
-    with tab4:
-        radar(selected_player, possession_features)
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Schießen", "Passen", "Flanken",
+                                                            "Ballbesitz", "Verteidigung", "Torwart", "Rest"])
 
-    with tab5:
-        radar(selected_player, defensive_features)
+        with tab1:
+            radar(selected_player, shooting_features)
+        
+        with tab2:
+            radar(selected_player, passing_features)
 
-    with tab6:
-        radar(selected_player, goalkeeping_features)
+        with tab3:
+            radar(selected_player, crossing_features)
 
-    with tab7:
-        radar(selected_player, Rest)
+        with tab4:
+            radar(selected_player, possession_features)
+
+        with tab5:
+            radar(selected_player, defensive_features)
+
+        with tab6:
+            radar(selected_player, goalkeeping_features)
+
+        with tab7:
+            radar(selected_player, Rest)
+
+st.divider()
+
+if st.button("Reload database"):
+    import_players()
