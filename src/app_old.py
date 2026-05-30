@@ -4,6 +4,10 @@ from src.db import *
 from src.charts import *
 from src.statics import *
 
+from src.pca import *
+from src.clustering import *
+from src.feature_set_analysis import *
+
 # Load in dataframes
 players = import_players()
 player_names = players["name"]
@@ -11,16 +15,16 @@ player_names = players["name"]
 st.set_page_config(layout="wide")
 
 pad1,top,pad2 = st.columns([1,2,1])
-top.title("⚽ Football Scouting AI")
-selected_name = top.selectbox("Choose a player:", player_names)
-selected_player = players[players["name"] == selected_name].iloc[0]
+top.title("Football Manager Scouting")
 
 st.divider()
 
 left, middle, right = st.columns([4, 3, 6])
 
 with left:
-    st.header(selected_name)
+    selected_name = st.selectbox("", player_names, label_visibility="collapsed")
+    selected_player = players[players["name"] == selected_name].iloc[0]
+
     gen = st.container(border = True)
 
     with gen:
@@ -58,8 +62,8 @@ with right:
 
     with chart:
 
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Schießen", "Passen", "Flanken",
-                                                            "Ballbesitz", "Verteidigung", "Torwart", "Rest"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Schießen", "Passen", "Flanken",
+                                                            "Ballbesitz", "Verteidigung", "Torwart"])
 
         with tab1:
             st.plotly_chart(radar(selected_name, players, shooting_features, comparison_group))
@@ -79,5 +83,15 @@ with right:
         with tab6:
             st.plotly_chart(radar(selected_name, players, goalkeeping_features, comparison_group))
 
-        with tab7:
-            st.plotly_chart(radar(selected_name, players, rest_features, comparison_group))
+st.divider()
+
+players_sig = players[players["min_"] > 900]
+players_in_group = players_sig[players[POSITION_GROUPS["ZM"]].any(axis=1)]
+
+stats = players_in_group[ZM_FEATURES].apply(pd.to_numeric, errors="coerce")
+pcts = stats.rank(pct=True)
+
+st.plotly_chart(plot_pca(pcts, players_in_group["name"].values))
+
+st.divider()
+

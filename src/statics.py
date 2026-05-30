@@ -40,12 +40,12 @@ shooting_features = [
 ]
 
 passing_features = [
-    "xa/90",          # expected assists → Chance creation
-    "vorl/90",        # key passes / assists prep
-    "pr_pässe/90",    # progressive passes
-    "e_pä/90",        # passes into final third (vermutlich)
-    "entp(s)/90",     # passes into penalty area / dangerous zone
-    "ps_a/90",        # pass attempts (volumen)
+    "xa/90",     
+    "vorl/90",     
+    "pr_pässe/90",
+    "e_pä/90",     
+    "entp(s)/90",  
+    "ps_a/90",    
     "ps_v/90",
     "ch/90"
 ]
@@ -71,7 +71,10 @@ defensive_features = [
     "ent_zwk/90",
     "blk/90",
     "klär/90",
-    "zwk/90"
+    "zwk/90",
+    "prserf/90",
+    "prsv/90",
+    "vek/90"
 ]
 
 goalkeeping_features = [
@@ -81,14 +84,7 @@ goalkeeping_features = [
     "paraden/90"
 ]
 
-rest_features = [
-    "prserf/90",
-    "prsv/90",
-    "vek/90"
-]
-
 POSITION_GROUPS = {
-    "Alle" : POSITIONS,
     "TW": ["TW(Z)"],
     "IV": ["V(Z)"],
     "AV": ["V(L)", "V(R)", "FV(L)", "FV(R)"],
@@ -98,3 +94,99 @@ POSITION_GROUPS = {
     "Flg": ["OM(L)", "OM(R)"],
     "ST": ["ST(Z)"]
 }
+
+TW_FEATURES = [
+    "xg_verh/90",
+    "paraden/90",
+    "zu0/90",
+    "ps_a/90",
+    "pr_pässe/90"
+]
+
+IV_FEATURES = [
+    "abb/90",
+    "blk/90",
+    "klär/90",
+    "ent_zwk/90",
+    "kopf_g/90",
+    "pr_pässe/90",
+    "ps_a/90",
+    "ballgew/90"
+]
+
+AV_FEATURES = [
+    "xa/90",
+    "vorl/90",
+    "drb/90",
+    "ang_fla/90",
+    "pr_pässe/90",
+    "ballgew/90",
+    "sprints/90",
+    "lauf/90"
+]
+
+DM_FEATURES = [
+    "ballgew/90",
+    "abb/90",
+    "ent_zwk/90",
+    "pr_pässe/90",
+    "ps_a/90",
+    "e_pä/90",
+    "prserf/90",
+    "lauf/90"
+]
+
+ZM_FEATURES = [
+    "xa/90",
+    "pr_pässe/90",
+    "e_pä/90",
+    "drb/90",
+    "ballgew/90",
+    "lauf/90",
+    "sch/90",
+    "prserf/90"
+]
+
+OM_FEATURES = [
+    "xg/90",
+    "xa/90",
+    "drb/90",
+    "e_pä/90",
+    "vorl/90",
+    "sch/90",
+    "ang_fla/90",
+    "ballverl/90"
+]
+
+FLG_FEATURES = [
+    "xg/90",
+    "xa/90",
+    "drb/90",
+    "ang_fla/90",
+    "vorl/90",
+    "sch/90",
+    "sprints/90",
+    "lauf/90"
+]
+
+ST_FEATURES = [
+    "xg/90",
+    "tor/90",
+    "sch/90",
+    "xg/schuss",
+    "kopf_g/90",
+    "drb/90",
+    "ballverl/90",
+    "prserf/90"
+]
+
+feature_sets = [
+    (TW_FEATURES, POSITION_GROUPS["TW"]),
+    (IV_FEATURES, POSITION_GROUPS["IV"]),
+    (AV_FEATURES, POSITION_GROUPS["AV"]),
+    (DM_FEATURES, POSITION_GROUPS["DM"]),
+    (ZM_FEATURES, POSITION_GROUPS["ZM"]),
+    (OM_FEATURES, POSITION_GROUPS["OM"]),
+    (FLG_FEATURES, POSITION_GROUPS["Flg"]),
+    (ST_FEATURES, POSITION_GROUPS["ST"])
+    ]

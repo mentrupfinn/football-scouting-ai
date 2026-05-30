@@ -4,25 +4,41 @@ from itertools import product
 import streamlit as st
 
 from src.statics import POSITIONS
+from src.stat_groups import stats
 
 @st.cache_data(show_spinner="Lade Spielerdaten...")
 def import_players(path="data/players_raw.html"):
-    df = pd.read_html(path, encoding="utf-8")[0]
+    players = pd.read_html(path, encoding="utf-8")[0] # Rohdatei einlesen
 
-    df.columns = (df.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(".", "_"))
+    players = players.drop(columns=["Empf", "Info"]) # unnötige Spalten entfernen
 
-    df = df.drop(columns=["empf", "info"])
+    # Spalten lesbarer benennen
 
-    df = df.replace("-", 0.0)
+    players = players.rename(columns={
+        "Eins" : "Einsätze",
+        "Min." : "Spielminuten"
+    })
 
-    df["lauf/90"] = (df["lauf/90"].str.replace("km", "", regex=False))
+    players = players.replace("-", 0.0) # Keine leeren Einträge
 
-    df["min_"] = pd.to_numeric(df["min_"], errors="coerce").astype("Int64")
+    players["Spielminuten"] = pd.to_numeric(players["Spielminuten"], errors="coerce").astype("Int64")
 
-    pos_matrix = df["position"].apply(encode_position_matrix).apply(pd.Series)
-    df = pd.concat([df, pos_matrix], axis=1)
+    players = players[players["Spielminuten"] > 900] # Nur statistisch relevante Einträge
 
-    return df
+    players["Lauf/90"] = (players["Lauf/90"].str.replace("km", "", regex=False))
+
+    players[stats] = players[stats].replace(",", ".", regex=True)
+
+    players[stats] = players[stats].apply(
+        pd.to_numeric,
+        errors="coerce"
+    )
+
+    # Positionen-String auftrennen in Positionsmatrix
+    pos_matrix = players["Position"].apply(encode_position_matrix).apply(pd.Series)
+    players = pd.concat([players, pos_matrix], axis=1)
+
+    return players
 
 def parse_fm_position(pos_string):
     pos_string = str(pos_string)

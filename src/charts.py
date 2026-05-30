@@ -1,7 +1,12 @@
 from src.statics import *
+from src.pca import *
+
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
+import numpy as np
+from scipy.stats import norm
 
 def plot_positions(player):
     fig, ax = plt.subplots(figsize=(4, 5), facecolor='none')
@@ -89,3 +94,21 @@ def get_valid_position_groups(player_row):
             valid_groups.append(group_name)
 
     return valid_groups
+
+def plot_pca(X, names):
+    X_pca, eigenvalues, eigenvectors = pca(X)
+
+    pca_df = pd.DataFrame({
+        "name": names,
+        "pc1": X_pca[:, 0],
+        "pc2": X_pca[:, 1]
+    })
+
+    fig = px.scatter(
+        pca_df,
+        x = "pc1",
+        y = "pc2",
+        hover_data=["name"]
+    )
+
+    return fig
