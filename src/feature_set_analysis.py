@@ -150,3 +150,20 @@ def plot_gmm(feature, k=2):
     ax.set_title(f"GMM (k={k})")
 
     return fig
+
+def feature_hist(players, position_group, feature, bins=10, filter_zeros = False):
+    pos_players = filter(players, position_group)
+    if filter_zeros:
+        values = pos_players[pos_players[feature] != 0][feature]
+    else:
+        values = pos_players[feature]
+
+    fig, ax = plt.subplots(figsize=(8,4))
+
+    ax.hist(values, bins=bins)
+
+    ax.set_title(f"Verteilung von {feature} bei {position_group}")
+    ax.set_xlabel(feature)
+    ax.set_ylabel("Anzahl Spieler")
+
+    return fig
